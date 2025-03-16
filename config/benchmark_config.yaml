@@ -1,0 +1,82 @@
+# Benchmark Configuration
+
+# Database connection settings
+databases:
+  scylla:
+    host: scylla
+    port: 9042  # Inside Docker network, use the container's port
+    keyspace: benchmark
+    username: ""
+    password: ""
+    timeout: 30  # seconds
+    consistency_level: "LOCAL_QUORUM"
+  
+  duckdb:
+    database_path: "./data/duckdb/benchmark.db"
+    memory_limit: "4GB"
+    threads: 4
+
+# Data generation settings
+data:
+  small:
+    rows: 10000  # Reduced for faster testing
+    file_path: "./data/small_dataset.parquet"
+  medium:
+    rows: 100000  # Reduced for faster testing
+    file_path: "./data/medium_dataset.parquet"
+  large:
+    rows: 1000000  # Reduced for faster testing
+    file_path: "./data/large_dataset.parquet"
+  columns:
+    - name: "id"
+      type: "uuid"
+    - name: "timestamp"
+      type: "timestamp"
+    - name: "user_id"
+      type: "int"
+    - name: "value"
+      type: "float"
+    - name: "category"
+      type: "string"
+      cardinality: 100
+    - name: "tags"
+      type: "list<string>"
+      max_length: 5
+    - name: "metadata"
+      type: "json"
+      max_keys: 10
+
+# Benchmark settings
+benchmarks:
+  iterations: 3  # Reduced for faster testing
+  warmup_iterations: 1  # Reduced for faster testing
+  timeout: 3600  # Maximum seconds for a benchmark to run
+  
+  # Types of benchmarks to run
+  types:
+    - data_loading
+    - point_reads
+    - range_scans
+    - aggregations
+    - joins
+    - writes
+    - mixed_workload
+    - concurrent_operations
+
+  # Concurrency levels to test
+  concurrency:
+    - 1
+    - 4
+    - 16
+
+# Output settings
+output:
+  results_dir: "./results"
+  formats:
+    - csv
+    - json
+    - markdown
+  visualizations:
+    - bar_charts
+    - line_charts
+    - heatmaps 
