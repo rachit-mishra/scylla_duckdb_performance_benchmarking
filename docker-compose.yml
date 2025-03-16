@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  scylla:
+    image: scylladb/scylla:5.2.0
+    container_name: scylla-node
+    ports:
+      - "9142:9042"  # Map container's 9042 to host's 9142
+    volumes:
+      - scylla-data:/var/lib/scylla
+    command: --smp 2 --memory 4G --overprovisioned 1
+    restart: unless-stopped
+    networks:
+      - db-benchmark-network
+
+  # DuckDB doesn't need a container as it's an embedded database
+  # We'll use it directly from Python
+
+  # Jupyter notebook for interactive analysis
+  jupyter:
+    image: jupyter/datascience-notebook:latest
+    container_name: jupyter-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./:/home/jovyan/work
+    command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+    networks:
+      - db-benchmark-network
+  
+  # Benchmark container
+  benchmark:
+    build:
+      context: .
+      dockerfile: docker/benchmark.Dockerfile
+    container_name: benchmark
+    volumes:
+      - ./data:/app/data
+      - ./results:/app/results
+    depends_on:
+      - scylla
+    networks:
+      - db-benchmark-network
+
+networks:
+  db-benchmark-network:
+    driver: bridge
+
+volumes:
+  scylla-data: 
