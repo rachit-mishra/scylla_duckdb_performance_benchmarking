@@ -29,10 +29,10 @@ data/*.parquet
 data/duckdb/*.db
 
 # Results
-results/*.csv
-results/*.json
-results/*.png
-results/*.html
+# results/*.csv
+# results/*.json
+# results/*.png
+# results/*.html
 
 # Jupyter Notebook
 .ipynb_checkpoints
